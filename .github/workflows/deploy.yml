@@ -20,15 +20,15 @@ jobs:
           EOF
 
       - name: Build Docker image
-        run: docker build -t dititikitu:latest .
+        run: docker build -t frontend:latest .
 
       - name: Save Docker image to file
-        run: docker save dititikitu:latest -o dititikitu.tar
+        run: docker save frontend:latest -o frontend.tar
 
       - name: Prepare deploy files
         run: |
-          mkdir dititikitu
-          mv dititikitu.tar docker-compose.yml dititikitu/
+          mkdir frontend
+          mv frontend.tar docker-compose.yml frontend/
 
       - name: Copy Docker image and .env to server
         uses: appleboy/scp-action@v0.1.4
@@ -36,7 +36,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          source: "dititikitu/*"
+          source: "frontend/*"
           target: "~/"
 
       - name: Deploy on remote server
@@ -46,12 +46,12 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd ~/dititikitu
+            cd ~/frontend
 
-            docker-compose down || true
-            docker rmi dititikitu:latest || true
+            docker compose down || true
+            docker rmi frontend:latest || true
             
-            docker load -i dititikitu.tar
-            rm dititikitu.tar
+            docker load -i frontend.tar
+            rm frontend.tar
             
-            docker-compose up -d
+            docker compose up -d
