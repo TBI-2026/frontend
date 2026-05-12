@@ -1,8 +1,12 @@
 version: '3.8'
 
 services:
-  dititikitu:
+  frontend:
     image: frontend:latest
     container_name: frontend
-    ports:
-      - "127.0.0.1:5173:80"
+    networks:
+      - internal-network
+
+networks:
+  internal-network:
+    external: true
